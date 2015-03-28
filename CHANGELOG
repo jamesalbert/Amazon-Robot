@@ -1,0 +1,16 @@
+vMajor.Minor.Patch
+
+v1.1.0
+    - text color based on log level
+    - acquires order id & Amazon tax, writes to .xlsx
+    - closes warranty popups
+    - dynamic paths
+    - installer
+    - uses soap API
+    - GOALS:
+        - custom browser (firefox, opera, etc)
+        - remote browser
+        - cleaner browser-close handling
+
+v1.0.0
+    - initial version
