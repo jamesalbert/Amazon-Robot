@@ -9,7 +9,6 @@ from libam.amazon import Amazon
 from libam.config import Config
 from libam.xls import Spreadsheet
 from libam.log import Log
-from libam.soap import Service
 from os import environ
 
 import Tkinter as tk, tkFileDialog, tkMessageBox
@@ -23,28 +22,41 @@ class Application:
         :param master: tk.TK
         :return:
         '''
-        print "Ignore this prompt, it's needed for the browser to start"
-
-        self.conf = Config()
-        self.conf.set('AMBOT_PATH', '%s\\AmazonRobot' % environ['LOCALAPPDATA'])
+        self.conf = self.get_config()
         self.ambot_path = self.conf.get('AMBOT_PATH')
+        self.manage_chromedriver()
+        self.master = master
+        self.builder = self.get_builder()
+        self.log = self.get_logger()
 
-        t = threading.Thread(target=bootstrap.selenium_server_on, args=(self.conf,))
-        t.start()
+    def get_logger(self):
+        '''get logger object'''
+        output_win = self.builder.get_object('output')
+        log = Log(output_win, self.ambot_path)
+        log.write('info', 'Amazon Robot started')
+        return log
 
-        self.builder = pygubu.Builder()
-        self.builder.add_resource_path('%s\\assets' % self.ambot_path)
-        self.builder.add_from_file('%s\\assets\\G.ui' % self.ambot_path)
-        self.main = self.builder.get_object('Main', master)
+    def get_builder(self):
+        '''get builder object'''
+        builder = pygubu.Builder()
+        builder.add_resource_path('%s\\assets' % self.ambot_path)
+        builder.add_from_file('%s\\assets\\G.ui' % self.ambot_path)
+        builder.get_object('Main', self.master)
+        '''setup button callbacks'''
         callbacks = {
             'browse': self.browse,
             'order': self.order
         }
-        self.builder.connect_callbacks(callbacks)
-        self.log = Log(self.get_output_window())
-        self.log.write('info', 'Amazon Robot started')
+        builder.connect_callbacks(callbacks)
+        return builder
 
-    def check_user_cache(self):
+    def get_config(self):
+        '''get configuration object'''
+        conf = Config()
+        conf.set('AMBOT_PATH', '%s\\AmazonRobot' % environ['LOCALAPPDATA'])
+        return conf
+
+    def fields_satisfied(self):
         '''
         checks if required preferences are set
         :return:
@@ -54,14 +66,19 @@ class Application:
         for k, v in preferences.iteritems():
             if k in required and not v:
                 tkMessageBox.showinfo('Reminder', 'Set all the required fields in File>Preferences')
-                break
+                return False
+        return True
 
-    def get_output_window(self):
-        '''
-        returns output window object
-        :return:
-        '''
-        return self.builder.get_object('output')
+    def set_order_button(self, state='normal'):
+        '''used for enabling/disabling order button'''
+        self.builder.get_object('order')['state'] = state
+
+    def load_spreadsheet(self):
+        file_obj = tkFileDialog.askopenfile(mode='r')
+        if not hasattr(file_obj, 'name'):
+            return True
+        self.xl_path = file_obj.name
+        return self.xl_path.endswith('.xlsx')
 
     def browse(self):
         '''
@@ -69,18 +86,12 @@ class Application:
         readies the script to order.
         :return:
         '''
-        try:
-            self.xlpath = tkFileDialog.askopenfile(mode='r').name
-            if not self.xlpath.endswith('.xlsx'):
-                raise IOError
-            self.builder.get_variable('path').set(self.xlpath)
-            self.builder.get_object('order')['state'] = 'normal'
-        except AttributeError:
-            '''the user closed it without choosing a file'''
-            pass
-        except IOError:
+        if not self.load_spreadsheet():
             tkMessageBox.showinfo('xlsx error', 'That is not an .xlsx file!')
-            self.builder.get_object('order')['state'] = 'disabled'
+            self.set_order_button('disabled')
+        else:
+            self.builder.get_variable('path').set(self.xl_path)
+            self.set_order_button('normal')
 
     def order(self):
         '''
@@ -89,37 +100,34 @@ class Application:
         :return:
         '''
 
-        '''
-        load up spreadsheet
-        '''
-        prefs = self.conf.get('preferences')
-        if not prefs['email'] or not prefs['password']:
-            self.log.write('error', 'must provide username and password in File>Preferences')
+        if not self.fields_satisfied():
             return
-        self.xl = Spreadsheet(self.xlpath)
-        test_cases = self.xl.toDict()
-        order_button = self.builder.get_object('order')
-        order_button['state'] = 'disabled'
+        self.set_order_button('disabled')
+        self.start_amazon_orders()
+
+    def start_amazon(self):
         '''
         load Amazon with Selenium
         '''
+        self.amazon = Amazon(self)
+        test_cases = Spreadsheet(self.xl_path).toDict()
+        if self.amazon.login():
+            try:
+                self.amazon.start_orders(test_cases)
+            except:
+                self.log.write('error', 'browser closed')
+        self.set_order_button('normal')
 
-        def start_amazon():
-            self.am = Amazon(self.conf, self.log)
-            if self.am.login():
-                try:
-                    self.am.start_orders(test_cases)
-                except Exception as e:
-                    try:
-                        self.log.write('error', e.msg[:15])
-                    except:
-                        self.log.write('error', e.message)
-                    self.log.write('info', 'browser closed')
-
-            order_button['state'] = 'normal'
-
-        t = threading.Thread(target=start_amazon)
+    def run_thread(self, fn, args=()):
+        t = threading.Thread(target=fn, args=args)
         t.start()
+
+    def manage_chromedriver(self):
+        '''manage chromedriver process'''
+        self.run_thread(bootstrap.selenium_server_on, (self.conf,))
+
+    def start_amazon_orders(self):
+        self.run_thread(self.start_amazon)
 
     def open_preferences(self):
         '''
@@ -200,10 +208,10 @@ if __name__ == '__main__':
     filemenu.add_command(label="Preferences", command=app.open_preferences)
     menubar.add_cascade(label="File", menu=filemenu)
     root.config(menu=menubar)
-    app.check_user_cache()
+    app.fields_satisfied()
 
     def close_services():
-        bootstrap.selenium_server_off()
+        bootstrap.services_off()
         root.quit()
 
     root.protocol('WM_DELETE_WINDOW', close_services)
@@ -211,4 +219,4 @@ if __name__ == '__main__':
     try:
         root.mainloop()
     except:
-        bootstrap.selenium_server_off()
+        bootstrap.services_off()

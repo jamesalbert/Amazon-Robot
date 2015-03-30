@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface>
+  <object class="ttk.Frame" id="Main">
+    <property name="height">240</property>
+    <property name="width">300</property>
+    <layout>
+      <property name="column">0</property>
+      <property name="propagate">True</property>
+      <property name="row">0</property>
+    </layout>
+    <child>
+      <object class="ttk.Label" id="title">
+        <layout>
+          <property name="column">0</property>
+          <property name="propagate">True</property>
+          <property name="row">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Entry" id="path">
+        <property name="font">TkDefaultFont</property>
+        <property name="text" translatable="yes">Path</property>
+        <property name="textvariable">string:path</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="ipadx">131</property>
+          <property name="padx">18</property>
+          <property name="propagate">True</property>
+          <property name="row">1</property>
+          <property name="sticky">w</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Button" id="order">
+        <property name="command">order</property>
+        <property name="default">active</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">order</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="padx">105</property>
+          <property name="propagate">True</property>
+          <property name="row">1</property>
+          <property name="sticky">e</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Button" id="browse">
+        <property name="command">browse</property>
+        <property name="default">active</property>
+        <property name="text" translatable="yes">browse</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="ipadx">0</property>
+          <property name="ipady">0</property>
+          <property name="padx">19</property>
+          <property name="pady">0</property>
+          <property name="propagate">True</property>
+          <property name="row">1</property>
+          <property name="rowspan">1</property>
+          <property name="sticky">e</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="out_frame">
+        <property name="height">480</property>
+        <property name="width">600</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="propagate">True</property>
+          <property name="row">2</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Text" id="output">
+        <property name="background">#000000</property>
+        <property name="font">{Verdana} 10 {}</property>
+        <property name="foreground">#ffffff</property>
+        <property name="height">25</property>
+        <property name="takefocus">true</property>
+        <property name="width">70</property>
+        <property name="wrap">word</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="propagate">True</property>
+          <property name="row">2</property>
+        </layout>
+      </object>
+    </child>
+  </object>
+</interface>

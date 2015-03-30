@@ -1,16 +1,26 @@
 vMajor.Minor.Patch
 
-v1.1.0
+v1.3.0
+    - smart add-on detector/handling
+    - mobile app
+    - soap service username/password checking
+    - major code clean up
+        - little to no xpath usage
+        - instantiate once, use everywhere
+    - GOALS:
+        - custom browser (firefox, opera, etc)
+        - remote browser
+        - cleaner browser-close handling
+        - gui to website
+
+v1.2.0 - current stable
     - text color based on log level
     - acquires order id & Amazon tax, writes to .xlsx
     - closes warranty popups
     - dynamic paths
     - installer
     - uses soap API
-    - GOALS:
-        - custom browser (firefox, opera, etc)
-        - remote browser
-        - cleaner browser-close handling
+    - logging
 
-v1.0.0
+v1.1.0
     - initial version

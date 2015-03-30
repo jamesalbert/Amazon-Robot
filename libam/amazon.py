@@ -14,7 +14,7 @@ from soap import Service
 import time
 
 class Amazon(object):
-    def __init__(self, conf, log):
+    def __init__(self, app):
         '''
         Amazon class
 
@@ -22,8 +22,8 @@ class Amazon(object):
         contacts, and purchase items.
         '''
         '''grab config file, setup logging'''
-        self.conf = conf
-        self.log = log
+        self.conf = app.conf
+        self.log = app.log
         self.case = None
         self.current_row = None
 
@@ -105,16 +105,16 @@ class Amazon(object):
         time.sleep(2)
 
         '''get product description'''
+        '''
         #desc_frame = self.driver.find_element_by_id('product-description-iframe')
         #self.driver.switch_to.frame(desc_frame)
         #desc = self.driver.find_element_by_class_name('productDescriptionWrapper').text
         #self.driver.switch_to.default_content()
         desc = self.driver.find_element_by_id('productTitle').text
-        self.log.write('info', 'desc: %s' % desc[:10])
+        '''
 
         '''get unit price'''
         unit_price = self.driver.find_element_by_id('priceblock_ourprice').text
-        self.log.write('info', 'unit price: %s' % unit_price)
 
         '''add to cart'''
         self.driver.find_element_by_name('submit.add-to-cart').click()
@@ -137,7 +137,7 @@ class Amazon(object):
         try:
             self.driver.find_element_by_xpath("//*[contains(text(), 'This is a gift')]").click()
         except:
-            self.log.write('warn', 'gift options not available')
+            self.log.write('warning', 'gift options not available')
 
         '''shipping'''
         time.sleep(2)
@@ -177,13 +177,11 @@ class Amazon(object):
         if self.driver.find_element_by_name('placeYourOrder1').is_displayed():
             amazon_tax_xpath = '//td[contains(text(), "$") and ancestor::tr[descendant::td[contains(text(), "Estimated tax to be collected")]]]'
             amazon_tax = self.driver.find_element_by_xpath(amazon_tax_xpath).text
-            self.log.write('info', 'amazon tax: %s' % amazon_tax)
             self.driver.find_element_by_name('placeYourOrder1').click()
             self.log.write('info', 'item purchased')
             self.delete_address(self.case.get('Ship To'))
             order_id = self.get_orderid()
             try:
-                raise Exception('skipping service api')
                 Service().set_order(
                     self.lg_id,
                     order_id,
@@ -239,11 +237,14 @@ class Amazon(object):
         '''start ordering products'''
         self.log.write('info', 'fulfilling orders')
         for i, case in enumerate(cases):
+            if not case.get('LG Order #'):
+                self.log.write('warning', 'reached end of .xlsx or lg order # omitted')
+                break
             self.case = case
             self.current_row = i + 2
             self.add_address()
             self.buy_product()
-        self.log.write('info', 'orders fulfilled')
+        self.log.write('info', 'orders automation completed')
         self.driver.close()
 
     def delete_address(self, name):

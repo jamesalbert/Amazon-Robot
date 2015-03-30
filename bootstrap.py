@@ -8,16 +8,10 @@
 from subprocess import Popen, PIPE, check_output
 from libam.config import Config
 
-def selenium_server_on(conf):
-    root = conf.get('root_path')
-    #Popen(['%sjava.exe' % root, '-jar', '%sselenium-server.jar' % root], stdout=PIPE)
+def services_on():
+    ambot_path = Config.get('AMBOT_PATH')
+    Popen(['%sjava.exe' % ambot_path, '-jar', '%sselenium-server.jar' % ambot_path], stdout=PIPE)
 
-def selenium_server_off():
-    #Popen(['taskkill', '/F', '/IM', 'java.exe'])
-    try:
-        Popen(['taskkill', '/F', '/IM', 'chromedriver.exe'])
-    except:
-        pass
-
-def check_dependencies():
-    pass
+def services_off():
+    Popen(['taskkill', '/F', '/IM', 'java.exe'])
+    Popen(['taskkill', '/F', '/IM', 'chromedriver.exe'])

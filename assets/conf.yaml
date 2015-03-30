@@ -1,0 +1,23 @@
+AMBOT_PATH: C:\Users\James\AppData\Local\AmazonRobot
+address:
+- {Ship To Name: enterAddressFullName}
+- {Ship To Adr 1: enterAddressAddressLine1}
+- {Ship To Adr 2: enterAddressAddressLine2}
+- {Ship To City: enterAddressCity}
+- {Ship To State: enterAddressStateOrRegion}
+- {Ship To Zip: enterAddressPostalCode}
+- {Phone: enterAddressPhoneNumber}
+buy_url: https://www.amazon.com/gp/buy/spc/handlers/display.html
+cart_url: http://www.amazon.com/gp/cart/view.html
+login_url: https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26ref_%3Dnav_signin
+manage_address_url: https://www.amazon.com/gp/css/account/address/view.html
+new_address_url: https://www.amazon.com/gp/css/account/address/view.html?viewID=newAddress
+usage_url: http://www.relurk.com/usage
+orders_url: https://www.amazon.com/gp/css/order-history
+payment_url: https://www.amazon.com/gp/buy/payselect/handlers/display.html
+preferences: {card_name: '', card_number: '', csc: '7', email: '',
+  exp_month: 1, exp_year: 2015, password: '', service_password: '',
+  service_user_id: ''}
+product_url: http://www.amazon.com/exec/obidos/ASIN/
+service_url: http://www.creativedatatech.com/LGWebService/Service1.svc?wsdl
+shipping_url: https://www.amazon.com/gp/buy/addressselect/handlers/display.html

@@ -20,8 +20,8 @@ class Service(object):
         '''
         self.conf = Config()
         self.url = self.conf.get('service_url')
-        self.user_id = 'jalbert' or self.conf.get('service_user_id')
-        self.password = 'cobb45cent8' or self.conf.get('service_password')
+        self.user_id = self.conf.get('service_user_id')
+        self.password = self.conf.get('service_password')
         self.cli = Client(self.url)
 
     def get_order(self, id):

@@ -9,8 +9,7 @@ from openpyxl import load_workbook
 
 class Spreadsheet(object):
     def __init__(self, path):
-        self.path = path
-        self.wb = load_workbook(filename=self.path)
+        self.wb = load_workbook(filename=path)
         self.nav = self.wb.active
         self.columns = self.nav.columns
         self.rows = self.nav.rows
@@ -30,7 +29,7 @@ class Spreadsheet(object):
         for row in self.rows[1:]:
             orders.append({})
             for col, cell in zip(cols, row):
-                if col in ['Ship To Zip', 'Phone'] and not isinstance(col, str):
+                if col in ['Ship To Zip', 'Phone'] and not isinstance(col, unicode):
                     '''
                     5-digit zip codes and phone numbers
                     get treated as numbers and a '.0' is appended to them.
